@@ -37,7 +37,7 @@ namespace TEST.API.Analytics.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var studentDO = await _context.Students.SingleOrDefaultAsync(m => m.ID == id);
+            var studentDO = await _context.Students.SingleOrDefaultAsync(m => m.Id == id);
 
             if (studentDO == null)
             {
@@ -56,7 +56,7 @@ namespace TEST.API.Analytics.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (id != studentDO.ID)
+            if (id != studentDO.Id)
             {
                 return BadRequest();
             }
@@ -94,7 +94,7 @@ namespace TEST.API.Analytics.API.Controllers
             _context.Students.Add(studentDO);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetStudentDO", new { id = studentDO.ID }, studentDO);
+            return CreatedAtAction("GetStudentDO", new { id = studentDO.Id }, studentDO);
         }
 
         // DELETE: api/Student/5
@@ -106,7 +106,7 @@ namespace TEST.API.Analytics.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var studentDO = await _context.Students.SingleOrDefaultAsync(m => m.ID == id);
+            var studentDO = await _context.Students.SingleOrDefaultAsync(m => m.Id == id);
             if (studentDO == null)
             {
                 return NotFound();
@@ -120,7 +120,7 @@ namespace TEST.API.Analytics.API.Controllers
 
         private bool StudentDOExists(int id)
         {
-            return _context.Students.Any(e => e.ID == id);
+            return _context.Students.Any(e => e.Id == id);
         }
     }
 }

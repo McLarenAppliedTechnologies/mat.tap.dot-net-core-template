@@ -37,7 +37,7 @@ namespace TEST.API.Analytics.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var enrollmentDO = await _context.Enrollments.SingleOrDefaultAsync(m => m.ID == id);
+            var enrollmentDO = await _context.Enrollments.SingleOrDefaultAsync(m => m.Id == id);
 
             if (enrollmentDO == null)
             {
@@ -56,7 +56,7 @@ namespace TEST.API.Analytics.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (id != enrollmentDO.ID)
+            if (id != enrollmentDO.Id)
             {
                 return BadRequest();
             }
@@ -94,7 +94,7 @@ namespace TEST.API.Analytics.API.Controllers
             _context.Enrollments.Add(enrollmentDO);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEnrollmentDO", new { id = enrollmentDO.ID }, enrollmentDO);
+            return CreatedAtAction("GetEnrollmentDO", new { id = enrollmentDO.Id }, enrollmentDO);
         }
 
         // DELETE: api/Enrollments/5
@@ -106,7 +106,7 @@ namespace TEST.API.Analytics.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var enrollmentDO = await _context.Enrollments.SingleOrDefaultAsync(m => m.ID == id);
+            var enrollmentDO = await _context.Enrollments.SingleOrDefaultAsync(m => m.Id == id);
             if (enrollmentDO == null)
             {
                 return NotFound();
@@ -120,7 +120,7 @@ namespace TEST.API.Analytics.API.Controllers
 
         private bool EnrollmentDOExists(int id)
         {
-            return _context.Enrollments.Any(e => e.ID == id);
+            return _context.Enrollments.Any(e => e.Id == id);
         }
     }
 }

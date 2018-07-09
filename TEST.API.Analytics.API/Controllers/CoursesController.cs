@@ -37,7 +37,7 @@ namespace TEST.API.Analytics.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var courseDO = await _context.Courses.SingleOrDefaultAsync(m => m.ID == id);
+            var courseDO = await _context.Courses.SingleOrDefaultAsync(m => m.Id == id);
 
             if (courseDO == null)
             {
@@ -56,7 +56,7 @@ namespace TEST.API.Analytics.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (id != courseDO.ID)
+            if (id != courseDO.Id)
             {
                 return BadRequest();
             }
@@ -98,7 +98,7 @@ namespace TEST.API.Analytics.API.Controllers
             }
             catch (DbUpdateException)
             {
-                if (CourseDOExists(courseDO.ID))
+                if (CourseDOExists(courseDO.Id))
                 {
                     return new StatusCodeResult(StatusCodes.Status409Conflict);
                 }
@@ -108,7 +108,7 @@ namespace TEST.API.Analytics.API.Controllers
                 }
             }
 
-            return CreatedAtAction("GetCourseDO", new { id = courseDO.ID }, courseDO);
+            return CreatedAtAction("GetCourseDO", new { id = courseDO.Id }, courseDO);
         }
 
         // DELETE: api/Courses/5
@@ -120,7 +120,7 @@ namespace TEST.API.Analytics.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var courseDO = await _context.Courses.SingleOrDefaultAsync(m => m.ID == id);
+            var courseDO = await _context.Courses.SingleOrDefaultAsync(m => m.Id == id);
             if (courseDO == null)
             {
                 return NotFound();
@@ -134,7 +134,7 @@ namespace TEST.API.Analytics.API.Controllers
 
         private bool CourseDOExists(int id)
         {
-            return _context.Courses.Any(e => e.ID == id);
+            return _context.Courses.Any(e => e.Id == id);
         }
     }
 }
