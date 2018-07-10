@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TEST.API.Analytics.API;
 using TEST.API.Analytics.API.DO;
+using TEST.API.Core.DataManagers;
+using TEST.API.Core.Factories;
 
 namespace TEST.API.Analytics.API.Controllers
 {
@@ -14,113 +16,88 @@ namespace TEST.API.Analytics.API.Controllers
     [Route("api/Enrollments")]
     public class EnrollmentsController : Controller
     {
-        private readonly Model _context;
+        private readonly IDataManager<EnrollmentDO, int> dataManager;
+        private readonly DbContext dbContext;
 
-        public EnrollmentsController(Model context)
+        public EnrollmentsController(IDataManager<EnrollmentDO, int> dataManager, IDbContextFactory dbContextFactory)
         {
-            _context = context;
+            this.dataManager = dataManager;
+            dbContext = dbContextFactory.CreateNewDbContext();
         }
 
         // GET: api/Enrollments
         [HttpGet]
-        public IEnumerable<EnrollmentDO> GetEnrollments()
+        public async Task<IActionResult> GetEnrollments()
         {
-            return _context.Enrollments;
+            var enrollmentDOs = await dataManager.GetAllItemsQuery(dbContext).ToListAsync();
+            return Ok(enrollmentDOs);
         }
 
         // GET: api/Enrollments/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetEnrollmentDO([FromRoute] int id)
+        public async Task<IActionResult> GetEnrollment([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                var enrollmentDO = await dataManager.GetItemById(dbContext, id);
+                return Ok(enrollmentDO);
             }
-
-            var enrollmentDO = await _context.Enrollments.SingleOrDefaultAsync(m => m.Id == id);
-
-            if (enrollmentDO == null)
+            catch (EntityNotFoundException ex)
             {
-                return NotFound();
-            }
 
-            return Ok(enrollmentDO);
+                return NotFound(ex.Message);
+            }
         }
 
         // PUT: api/Enrollments/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEnrollmentDO([FromRoute] int id, [FromBody] EnrollmentDO enrollmentDO)
+        public async Task<IActionResult> PutEnrollment([FromRoute] int id, [FromBody] EnrollmentDO enrollmentDO)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            if (id != enrollmentDO.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(enrollmentDO).State = EntityState.Modified;
+            if (id != enrollmentDO.Id) return BadRequest();
 
             try
             {
-                await _context.SaveChangesAsync();
+                await dataManager.UpdateEntity(dbContext, enrollmentDO);
+                return NoContent();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (EntityNotFoundException ex)
             {
-                if (!EnrollmentDOExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound(ex.Message);
             }
-
-            return NoContent();
         }
 
         // POST: api/Enrollments
         [HttpPost]
-        public async Task<IActionResult> PostEnrollmentDO([FromBody] EnrollmentDO enrollmentDO)
+        public async Task<IActionResult> PostEnrollment([FromBody] EnrollmentDO enrollmentDO)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
             {
-                return BadRequest(ModelState);
+                var result = await dataManager.AddEntity(dbContext, enrollmentDO);
+                return Created("", enrollmentDO);
             }
-
-            _context.Enrollments.Add(enrollmentDO);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetEnrollmentDO", new { id = enrollmentDO.Id }, enrollmentDO);
+            catch (EntityNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         // DELETE: api/Enrollments/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEnrollmentDO([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                await dataManager.DeleteEntity(dbContext, id);
+                return Ok();
             }
-
-            var enrollmentDO = await _context.Enrollments.SingleOrDefaultAsync(m => m.Id == id);
-            if (enrollmentDO == null)
+            catch (EntityNotFoundException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-
-            _context.Enrollments.Remove(enrollmentDO);
-            await _context.SaveChangesAsync();
-
-            return Ok(enrollmentDO);
-        }
-
-        private bool EnrollmentDOExists(int id)
-        {
-            return _context.Enrollments.Any(e => e.Id == id);
         }
     }
 }
