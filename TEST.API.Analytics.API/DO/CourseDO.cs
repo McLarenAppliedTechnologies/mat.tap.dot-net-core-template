@@ -10,18 +10,11 @@ namespace TEST.API.Analytics.API.DO
 {
     public class CourseDO : IEntity
     {
-        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        [Column]
         public int Id { get; set; }
-        
-        [Column]
         public string Title { get; set; }
-
-        [Column]
         public int Credits { get; set; }
 
-        [ForeignKey(nameof(EnrollmentDO.Id))]
         public ICollection<EnrollmentDO> Enrollments { get; set; }
     }
 }

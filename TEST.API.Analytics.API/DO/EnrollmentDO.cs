@@ -11,23 +11,12 @@ namespace TEST.API.Analytics.API.DO
 
     public class EnrollmentDO : IEntity
     {
-        [Key]
-        [Column]
         public int Id { get; set; }
-
-        [Column]
-        public int CourseID { get; set; }
-
-        [Column]
-        public int StudentID { get; set; }
-
-        [Column]
+        public int CourseId { get; set; }
+        public int StudentId { get; set; }
         public Grade? Grade { get; set; }
 
-        [ForeignKey(nameof(CourseDO.Id))]
         public CourseDO Course { get; set; }
-
-        [ForeignKey(nameof(StudentDO.Id))]
         public StudentDO Student { get; set; }
     }
 }

@@ -35,13 +35,13 @@ namespace TEST.API.Analytics.API
 
             var courses = new CourseDO[]
             {
-            new CourseDO{ID=1050,Title="Chemistry",Credits=3},
-            new CourseDO{ID=4022,Title="Microeconomics",Credits=3},
-            new CourseDO{ID=4041,Title="Macroeconomics",Credits=3},
-            new CourseDO{ID=1045,Title="Calculus",Credits=4},
-            new CourseDO{ID=3141,Title="Trigonometry",Credits=4},
-            new CourseDO{ID=2021,Title="Composition",Credits=3},
-            new CourseDO{ID=2042,Title="Literature",Credits=4}
+            new CourseDO{Id=1050,Title="Chemistry",Credits=3},
+            new CourseDO{Id=4022,Title="Microeconomics",Credits=3},
+            new CourseDO{Id=4041,Title="Macroeconomics",Credits=3},
+            new CourseDO{Id=1045,Title="Calculus",Credits=4},
+            new CourseDO{Id=3141,Title="Trigonometry",Credits=4},
+            new CourseDO{Id=2021,Title="Composition",Credits=3},
+            new CourseDO{Id=2042,Title="Literature",Credits=4}
             };
             foreach (CourseDO c in courses)
             {
@@ -51,18 +51,18 @@ namespace TEST.API.Analytics.API
 
             var enrollments = new EnrollmentDO[]
             {
-            new EnrollmentDO{StudentID=1,ID=1050,Grade=Grade.A},
-            new EnrollmentDO{StudentID=1,ID=4022,Grade=Grade.C},
-            new EnrollmentDO{StudentID=1,ID=4041,Grade=Grade.B},
-            new EnrollmentDO{StudentID=2,ID=1045,Grade=Grade.B},
-            new EnrollmentDO{StudentID=2,ID=3141,Grade=Grade.F},
-            new EnrollmentDO{StudentID=2,ID=2021,Grade=Grade.F},
-            new EnrollmentDO{StudentID=3,ID=1050},
-            new EnrollmentDO{StudentID=4,ID=1050},
-            new EnrollmentDO{StudentID=4,ID=4022,Grade=Grade.F},
-            new EnrollmentDO{StudentID=5,ID=4041,Grade=Grade.C},
-            new EnrollmentDO{StudentID=6,ID=1045},
-            new EnrollmentDO{StudentID=7,ID=3141,Grade=Grade.A},
+            new EnrollmentDO{StudentId=1,CourseId=1050,Grade=Grade.A},
+            new EnrollmentDO{StudentId=1,CourseId=4022,Grade=Grade.C},
+            new EnrollmentDO{StudentId=1,CourseId=4041,Grade=Grade.B},
+            new EnrollmentDO{StudentId=2,CourseId=1045,Grade=Grade.B},
+            new EnrollmentDO{StudentId=2,CourseId=3141,Grade=Grade.F},
+            new EnrollmentDO{StudentId=2,CourseId=2021,Grade=Grade.F},
+            new EnrollmentDO{StudentId=3,CourseId=1050},
+            new EnrollmentDO{StudentId=4,CourseId=1050},
+            new EnrollmentDO{StudentId=4,CourseId=4022,Grade=Grade.F},
+            new EnrollmentDO{StudentId=5,CourseId=4041,Grade=Grade.C},
+            new EnrollmentDO{StudentId=6,CourseId=1045},
+            new EnrollmentDO{StudentId=7,CourseId=3141,Grade=Grade.A},
             };
             foreach (EnrollmentDO e in enrollments)
             {
