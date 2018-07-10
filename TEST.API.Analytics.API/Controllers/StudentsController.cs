@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TEST.API.Analytics.API;
 using TEST.API.Analytics.API.DO;
+using TEST.API.Core.DataManagers;
+using TEST.API.Core.Factories;
 
 namespace TEST.API.Analytics.API.Controllers
 {
@@ -14,113 +16,88 @@ namespace TEST.API.Analytics.API.Controllers
     [Route("api/Student")]
     public class StudentsController : Controller
     {
-        private readonly Model _context;
+        private readonly IDataManager<StudentDO, int> dataManager;
+        private readonly DbContext dbContext;
 
-        public StudentsController(Model context)
+        public StudentsController(IDataManager<StudentDO, int> dataManager, IDbContextFactory dbContextFactory)
         {
-            _context = context;
+            this.dataManager = dataManager;
+            dbContext = dbContextFactory.CreateNewDbContext();
         }
 
         // GET: api/Student
         [HttpGet]
-        public IEnumerable<StudentDO> GetStudents()
+        public async Task<IActionResult> GetStudents()
         {
-            return _context.Students;
+            var studentDOs = await dataManager.GetAllItemsQuery(dbContext).ToListAsync();
+            return Ok(studentDOs);
         }
 
         // GET: api/Student/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetStudentDO([FromRoute] int id)
+        public async Task<IActionResult> GetStudent([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                var studentDO = await dataManager.GetItemById(dbContext, id);
+                return Ok(studentDO);
             }
-
-            var studentDO = await _context.Students.SingleOrDefaultAsync(m => m.Id == id);
-
-            if (studentDO == null)
+            catch (EntityNotFoundException ex)
             {
-                return NotFound();
-            }
 
-            return Ok(studentDO);
+                return NotFound(ex.Message);
+            }
         }
 
         // PUT: api/Student/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutStudentDO([FromRoute] int id, [FromBody] StudentDO studentDO)
+        public async Task<IActionResult> PutStudent([FromRoute] int id, [FromBody] StudentDO studentDO)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            if (id != studentDO.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(studentDO).State = EntityState.Modified;
+            if (id != studentDO.Id) return BadRequest();
 
             try
             {
-                await _context.SaveChangesAsync();
+                await dataManager.UpdateEntity(dbContext, studentDO);
+                return NoContent();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (EntityNotFoundException ex)
             {
-                if (!StudentDOExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound(ex.Message);
             }
-
-            return NoContent();
         }
 
         // POST: api/Student
         [HttpPost]
-        public async Task<IActionResult> PostStudentDO([FromBody] StudentDO studentDO)
+        public async Task<IActionResult> PostStudent([FromBody] StudentDO studentDO)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
             {
-                return BadRequest(ModelState);
+                var result = await dataManager.AddEntity(dbContext, studentDO);
+                return Created("", studentDO);
             }
-
-            _context.Students.Add(studentDO);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetStudentDO", new { id = studentDO.Id }, studentDO);
+            catch (EntityNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         // DELETE: api/Student/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteStudentDO([FromRoute] int id)
+        public async Task<IActionResult> DeleteStudent([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                await dataManager.DeleteEntity(dbContext, id);
+                return Ok();
             }
-
-            var studentDO = await _context.Students.SingleOrDefaultAsync(m => m.Id == id);
-            if (studentDO == null)
+            catch (EntityNotFoundException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-
-            _context.Students.Remove(studentDO);
-            await _context.SaveChangesAsync();
-
-            return Ok(studentDO);
-        }
-
-        private bool StudentDOExists(int id)
-        {
-            return _context.Students.Any(e => e.Id == id);
         }
     }
 }
