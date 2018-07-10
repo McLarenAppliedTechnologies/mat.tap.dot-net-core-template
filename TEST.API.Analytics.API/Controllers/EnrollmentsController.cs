@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TEST.API.Analytics.API;
 using TEST.API.Analytics.API.DO;
+using TEST.API.Analytics.API.DTO;
 using TEST.API.Core.DataManagers;
 using TEST.API.Core.Factories;
 
@@ -18,11 +16,13 @@ namespace TEST.API.Analytics.API.Controllers
     {
         private readonly IDataManager<EnrollmentDO, int> dataManager;
         private readonly DbContext dbContext;
+        private readonly IMapper mapper;
 
-        public EnrollmentsController(IDataManager<EnrollmentDO, int> dataManager, IDbContextFactory dbContextFactory)
+        public EnrollmentsController(IDataManager<EnrollmentDO, int> dataManager, IDbContextFactory dbContextFactory, IMapper mapper)
         {
             this.dataManager = dataManager;
             dbContext = dbContextFactory.CreateNewDbContext();
+            this.mapper = mapper;
         }
 
         // GET: api/Enrollments
@@ -30,7 +30,8 @@ namespace TEST.API.Analytics.API.Controllers
         public async Task<IActionResult> GetEnrollments()
         {
             var enrollmentDOs = await dataManager.GetAllItemsQuery(dbContext).ToListAsync();
-            return Ok(enrollmentDOs);
+            var dtos = mapper.Map<IList<EnrollmentDTO>>(enrollmentDOs);
+            return Ok(dtos);
         }
 
         // GET: api/Enrollments/5
@@ -40,11 +41,11 @@ namespace TEST.API.Analytics.API.Controllers
             try
             {
                 var enrollmentDO = await dataManager.GetItemById(dbContext, id);
-                return Ok(enrollmentDO);
+                var dto = mapper.Map<EnrollmentDTO>(enrollmentDO);
+                return Ok(dto);
             }
             catch (EntityNotFoundException ex)
             {
-
                 return NotFound(ex.Message);
             }
         }

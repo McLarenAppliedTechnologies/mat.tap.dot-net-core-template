@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +26,7 @@ namespace TEST.API.Analytics.API
             services.AddDbContext<Model>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddTransient<IDataManager<StudentDO, int>, DataManager<StudentDO>>();
             services.AddTransient<IDataManager<EnrollmentDO, int>, DataManager<EnrollmentDO>>();
+            services.AddAutoMapper();
             services.AddMvc();
         }
 

@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TEST.API.Analytics.API;
+using AutoMapper;
 using TEST.API.Analytics.API.DO;
 using TEST.API.Core.DataManagers;
 using TEST.API.Core.Factories;
+using System.Collections.Generic;
+using TEST.API.Analytics.API.DTO;
 
 namespace TEST.API.Analytics.API.Controllers
 {
@@ -18,11 +16,13 @@ namespace TEST.API.Analytics.API.Controllers
     {
         private readonly IDataManager<StudentDO, int> dataManager;
         private readonly DbContext dbContext;
+        private readonly IMapper mapper;
 
-        public StudentsController(IDataManager<StudentDO, int> dataManager, IDbContextFactory dbContextFactory)
+        public StudentsController(IDataManager<StudentDO, int> dataManager, IDbContextFactory dbContextFactory, IMapper mapper)
         {
             this.dataManager = dataManager;
             dbContext = dbContextFactory.CreateNewDbContext();
+            this.mapper = mapper;
         }
 
         // GET: api/Student
@@ -30,7 +30,8 @@ namespace TEST.API.Analytics.API.Controllers
         public async Task<IActionResult> GetStudents()
         {
             var studentDOs = await dataManager.GetAllItemsQuery(dbContext).ToListAsync();
-            return Ok(studentDOs);
+            var dtos = mapper.Map<IList<StudentDTO>>(studentDOs);
+            return Ok(dtos);
         }
 
         // GET: api/Student/5
@@ -40,11 +41,11 @@ namespace TEST.API.Analytics.API.Controllers
             try
             {
                 var studentDO = await dataManager.GetItemById(dbContext, id);
+                var dto = mapper.Map<StudentDTO>(studentDO);
                 return Ok(studentDO);
             }
             catch (EntityNotFoundException ex)
             {
-
                 return NotFound(ex.Message);
             }
         }
