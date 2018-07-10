@@ -9,8 +9,6 @@ namespace TEST.API.Analytics.API.DTO
         [DataMember]
         public int ID { get; set; }
         [DataMember]
-        public int CourseID { get; set; }
-        [DataMember]
         public int StudentID { get; set; }
         [DataMember]
         public Grade? Grade { get; set; }

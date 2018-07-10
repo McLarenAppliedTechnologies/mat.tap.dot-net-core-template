@@ -9,13 +9,11 @@ namespace TEST.API.Analytics.API
         {
         }
 
-        public DbSet<CourseDO> Courses { get; set; }
         public DbSet<EnrollmentDO> Enrollments { get; set; }
         public DbSet<StudentDO> Students { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<CourseDO>().ToTable("Course");
             modelBuilder.Entity<EnrollmentDO>().ToTable("Enrollment");
             modelBuilder.Entity<StudentDO>().ToTable("Student");
         }

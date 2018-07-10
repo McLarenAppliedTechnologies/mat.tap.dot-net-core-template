@@ -12,11 +12,9 @@ namespace TEST.API.Analytics.API.DO
     public class EnrollmentDO : IEntity
     {
         public int Id { get; set; }
-        public int CourseId { get; set; }
         public int StudentId { get; set; }
         public Grade? Grade { get; set; }
 
-        public CourseDO Course { get; set; }
         public StudentDO Student { get; set; }
     }
 }
