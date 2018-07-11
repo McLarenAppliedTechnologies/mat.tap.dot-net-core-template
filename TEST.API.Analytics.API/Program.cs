@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Unity.Microsoft.DependencyInjection;
+using NLog;
+using NLog.Web;
 
 namespace TEST.API.Analytics.API
 {
@@ -11,29 +13,37 @@ namespace TEST.API.Analytics.API
     {
         public static void Main(string[] args)
         {
-            var host = BuildWebHost(args);
-            // Temp using block to seed the db.
-            using(var scope = host.Services.CreateScope())
+            var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
+            try
             {
-                var services = scope.ServiceProvider;
-                try
+                var host = BuildWebHost(args);
+                using (var scope = host.Services.CreateScope())
                 {
+                    var services = scope.ServiceProvider;
                     var context = services.GetRequiredService<Model>();
                     DbInitializer.Initialize(context);
                 }
-                catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred while seeding the database.");
-                }
+                host.Run();
             }
-            host.Run();
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to start program due to exception.");
+            } finally
+            {
+                LogManager.Shutdown();
+            }
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseUnityServiceProvider()
                 .UseStartup<Startup>()
+                .ConfigureLogging(logging => 
+                {
+                    logging.ClearProviders();
+                    logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+                })
+                .UseNLog()
                 .Build();
     }
 }
