@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using AutoMapper;
 using TEST.API.Analytics.API.DO;
 using TEST.API.Core.DataManagers;
@@ -17,12 +18,14 @@ namespace TEST.API.Analytics.API.Controllers
         private readonly IDataManager<StudentDO, int> dataManager;
         private readonly DbContext dbContext;
         private readonly IMapper mapper;
+        private readonly ILogger<StudentsController> logger;
 
-        public StudentsController(IDataManager<StudentDO, int> dataManager, IDbContextFactory dbContextFactory, IMapper mapper)
+        public StudentsController(IDataManager<StudentDO, int> dataManager, IDbContextFactory dbContextFactory, IMapper mapper, ILogger<StudentsController> logger)
         {
             this.dataManager = dataManager;
             dbContext = dbContextFactory.CreateNewDbContext();
             this.mapper = mapper;
+            this.logger = logger;
         }
 
         // GET: api/Student
@@ -31,6 +34,7 @@ namespace TEST.API.Analytics.API.Controllers
         {
             var studentDOs = await dataManager.GetAllItemsQuery(dbContext).ToListAsync();
             var dtos = mapper.Map<IList<StudentDTO>>(studentDOs);
+            logger.LogInformation("Request to GetStudents.");
             return Ok(dtos);
         }
 
@@ -46,6 +50,7 @@ namespace TEST.API.Analytics.API.Controllers
             }
             catch (EntityNotFoundException ex)
             {
+                logger.LogError(ex, "Failed to retrieve student information due to exception.");
                 return NotFound(ex.Message);
             }
         }

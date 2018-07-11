@@ -24,6 +24,7 @@ namespace TEST.API.Analytics.API
                     DbInitializer.Initialize(context);
                 }
                 host.Run();
+                logger.Info("Program started");
             }
             catch (Exception ex)
             {
